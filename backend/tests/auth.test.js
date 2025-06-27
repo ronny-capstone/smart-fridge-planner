@@ -2,7 +2,7 @@ const sqlite3 = require("sqlite3");
 const express = require("express");
 const path = require("path");
 const session = require("express-session");
-const authRoutes = require("../routes/auth");
+const authRoutes = require("../routes/authRoutes");
 const request = require("supertest");
 const StatusCodes = require("http-status-codes").StatusCodes;
 

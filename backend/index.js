@@ -1,8 +1,8 @@
 const db = require("./connect");
 const express = require("express");
 const session = require("express-session");
-const authRoutes = require("./routes/auth");
-const logRoutes = require("./routes/consumption_routes");
+const authRoutes = require("./routes/authRoutes");
+const logRoutes = require("./routes/logRoutes");
 
 const app = express();
 const PORT = 3000;

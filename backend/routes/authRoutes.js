@@ -4,13 +4,13 @@ const bcrypt = require("bcrypt");
 const path = require("path");
 const StatusCodes = require("http-status-codes").StatusCodes;
 
-const router = express.Router();
+const authRoutes = express.Router();
 const dbPath = path.resolve(__dirname, "../db/fridge.db");
 
 const db = new sqlite3.Database(dbPath);
 
 // Signup Route
-router.post("/signup", async (req, res) => {
+authRoutes.post("/signup", (req, res) => {
   // Case-insensitive username
   const username = req.body.username.toLowerCase();
   const password = req.body.password;
@@ -68,7 +68,7 @@ router.post("/signup", async (req, res) => {
 });
 
 // Login Route
-router.post("/login", async (req, res) => {
+authRoutes.post("/login", async (req, res) => {
   const username = req.body.username.toLowerCase();
   const password = req.body.password;
 
@@ -130,7 +130,7 @@ router.post("/login", async (req, res) => {
 });
 
 // Check if user is logged in
-router.get("/me", async (req, res) => {
+authRoutes.get("/me", async (req, res) => {
   if (!req.session.userId) {
     return res.status(StatusCodes.UNAUTHORIZED).send("Not logged in");
   }
@@ -159,7 +159,7 @@ router.get("/me", async (req, res) => {
 });
 
 // Logout Route
-router.post("/logout", (req, res) => {
+authRoutes.post("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       return res
@@ -171,4 +171,4 @@ router.post("/logout", (req, res) => {
   });
 });
 
-module.exports = router;
+module.exports = authRoutes;
