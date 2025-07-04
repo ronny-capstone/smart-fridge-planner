@@ -7,7 +7,9 @@ export default function LogList() {
   const [logs, setLogs] = useState([]);
   const [activeModal, setActiveModal] = useState(null);
   const [logToUpdate, setLogToUpdate] = useState(null);
+  const [foodItems, setFoodItems] = useState([]);
   const LOG_PATH = "/log";
+  const FOOD_PATH = "/food";
 
   useEffect(() => {
     fetch(`${API_BASE_URL}${LOG_PATH}`)
@@ -18,7 +20,21 @@ export default function LogList() {
       .catch((err) => {
         console.log(err.message);
       });
+
+    fetch(`${API_BASE_URL}${FOOD_PATH}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setFoodItems(data);
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
   }, [setLogs]);
+
+  const getFoodNameById = (itemId) => {
+    const foodItem = foodItems.find((item) => item.id === itemId);
+    return foodItem ? foodItem.name : "Unknown id";
+  };
 
   const handleLogAdded = (createdLog) => {
     setLogs((prevLogs) => [createdLog.log, ...prevLogs]);
@@ -110,7 +126,7 @@ export default function LogList() {
                   {" "}
                   Log for {formatDateString(log.date_logged)}{" "}
                 </h3>
-                <p className="log-item"> Food item: {log.item_id} </p>
+                <p className="log-item"> Food item: {getFoodNameById(log.item_id)} </p>
                 <p className="log-servings"> Servings: {log.servings} </p>
                 <button onClick={() => openUpdateModal(log)}> Update </button>
                 <button onClick={() => handleDelete(log)}> Delete </button>

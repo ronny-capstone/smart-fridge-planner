@@ -22,12 +22,11 @@ logRoutes.post("/", (req, res) => {
     db.run(
       `INSERT INTO consumption_logs (user_id, item_id, servings, date_logged) VALUES (?, ?, ?, ?)`,
       [user_id, item_id, servings, date_logged],
-      [user_id, item_id, servings, date_logged],
       function (err) {
         if (err) {
           return res
             .status(StatusCodes.INTERNAL_SERVER_ERROR)
-            .send("Error inserting into table");
+            .send("Unable to save log entry");
         }
         const insertedLog = {
           id: this.lastID,
@@ -54,7 +53,7 @@ logRoutes.get("/", async (req, res) => {
     if (err) {
       return res
         .status(StatusCodes.INTERNAL_SERVER_ERROR)
-        .send("Database error");
+        .send("Unable to retrieve logs");
     }
     return res.status(StatusCodes.OK).json(rows);
   });
@@ -70,7 +69,7 @@ logRoutes.get("/:id", async (req, res) => {
       if (err) {
         return res
           .status(StatusCodes.INTERNAL_SERVER_ERROR)
-          .send("Database error");
+          .send("Unable to retrieve log");
       }
       if (!row) {
         return res.status(StatusCodes.NOT_FOUND).send("Log entry not found");
@@ -146,7 +145,7 @@ logRoutes.patch("/:id", async (req, res) => {
 logRoutes.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    db.get("SELECT * FROM consumption_logs WHERE id = ?", [id], (err, row) => {
+    db.get("SELECT id FROM consumption_logs WHERE id = ?", [id], (err, row) => {
       if (err) {
         return res
           .status(StatusCodes.INTERNAL_SERVER_ERROR)

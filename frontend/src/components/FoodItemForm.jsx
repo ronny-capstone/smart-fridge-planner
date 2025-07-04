@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
+import { API_BASE_URL } from "../utils/api";
 
 export default function FoodItemForm({ handleItemAdded }) {
   const [foodItem, setFoodItem] = useState("");
-  const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (foodItem.trim() === "") {
       alert("Please fill out all fields.");
@@ -12,7 +12,7 @@ export default function FoodItemForm({ handleItemAdded }) {
     }
 
     try {
-      fetch(`${baseUrl}/food/search?query=${encodeURIComponent(foodItem)}`)
+      fetch(`${API_BASE_URL}/food/search?query=${encodeURIComponent(foodItem)}`)
         .then((response) => {
           const contentType = response.headers.get("content-type");
           if (contentType && contentType.includes("application/json")) {

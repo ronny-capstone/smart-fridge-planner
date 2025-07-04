@@ -8,8 +8,8 @@ const axios = require("axios");
 const apiKey = process.env.SPOONACULAR_API_KEY;
 const baseUrl = process.env.SPOONACULAR_BASE_URL;
 const dbPath = path.resolve(__dirname, "../db/fridge.db");
-const SEARCH_PATH = "/search"
-const NUTRITION_PATH = "/nutrition"
+const SEARCH_PATH = "/search";
+const NUTRITION_PATH = "/nutrition";
 const db = new sqlite3.Database(dbPath);
 
 // Get all food items
@@ -89,6 +89,23 @@ foodRoutes.post("/", async (req, res) => {
       .json({ error: "Missing required fields" });
   }
   try {
+    // Check if food item is already in db
+    db.get(
+      "SELECT name FROM food_items WHERE LOWER(name) = LOWER(?)",
+      [name],
+      (err, row) => {
+        if (err) {
+          return res
+            .status(StatusCodes.INTERNAL_SERVER_ERROR)
+            .json({ error: "Error adding food item" });
+        }
+        if (row) {
+          return res
+            .status(StatusCodes.CONFLICT)
+            .json({ error: "Food item already logged", existingItem: row });
+        }
+      }
+    );
     db.run(
       `INSERT INTO food_items (name, calories, protein, carbs, fats, sugars) VALUES (?, ?, ?, ?, ?, ?)`,
       [name, calories, protein, carbs, fats, sugars],
@@ -114,6 +131,42 @@ foodRoutes.post("/", async (req, res) => {
       message: "An error occurred while adding a food item",
       error: err.message,
     });
+  }
+});
+
+// Delete from foodItems db
+foodRoutes.delete("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    db.get("SELECT name FROM food_items WHERE id = ?", [id], (err, row) => {
+      if (err) {
+        return res
+          .status(StatusCodes.INTERNAL_SERVER_ERROR)
+          .json({ error: "Database error" });
+      }
+
+      if (!row) {
+        return res
+          .status(StatusCodes.NOT_FOUND)
+          .json({ error: "Food item not found" });
+      }
+      db.run("DELETE FROM food_items WHERE id = ?", [id], function (err) {
+        if (err) {
+          return res
+            .status(StatusCodes.INTERNAL_SERVER_ERROR)
+            .json({ error: "Error deleeting food item" });
+        }
+
+        return res.status(StatusCodes.OK).json({
+          message: "Food item deleted successfully",
+          deletedItem: row,
+        });
+      });
+    });
+  } catch (err) {
+    return res
+      .status(StatusCodes.INTERNAL_SERVER_ERROR)
+      .json({ error: "An error occurred while deleting a food item" });
   }
 });
 
