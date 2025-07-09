@@ -4,12 +4,9 @@ const path = require("path");
 const express = require("express");
 const groceryRoutes = express.Router();
 const StatusCodes = require("http-status-codes").StatusCodes;
+const checkInvalidVariable = require("../utils/invalidVars.jsx");
 const dbPath = path.resolve(__dirname, "../db/fridge.db");
 const db = new sqlite3.Database(dbPath);
-
-const checkInvalidVariable = (variable) => {
-  return variable === undefined || variable === null || variable === "";
-};
 
 // Get all grocery items for a user
 groceryRoutes.get("/", async (req, res) => {

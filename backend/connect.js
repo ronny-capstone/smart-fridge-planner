@@ -24,7 +24,10 @@ db.serialize(() => {
           calorie_goal INTEGER NOT NULL,
           protein_goal INTEGER NOT NULL,
           carb_goal INTEGER NOT NULL,
-          fat_goal INTEGER NOT NULL
+          fat_goal INTEGER NOT NULL,
+          bmr INTEGER,
+          tdee INTEGER,
+          profile_completed BOOLEAN DEFAULT FALSE
           )`
   );
 
