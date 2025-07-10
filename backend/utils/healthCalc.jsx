@@ -7,7 +7,7 @@ const heightToCm = (feet, inches) => {
 };
 
 const calculateBMR = (gender, age, weight_kg, height_feet, height_inches) => {
-  if (gender === "woman") {
+  if (gender === "Female") {
     return (
       447.593 +
       9.247 * weight_kg +
@@ -33,7 +33,7 @@ const calculateTDEE = (
   height_inches
 ) => {
   let bmr = 0;
-  if (gender === "woman") {
+  if (gender === "Female") {
     bmr =
       10 * weight_kg +
       6.25 * heightToCm(height_feet, height_inches) -
@@ -53,9 +53,9 @@ const calculateTDEE = (
     return bmr * 1.375;
   } else if (activity === "Moderately active") {
     return bmr * 1.55;
-  } else if (activity === "Active") {
-    return bmr * 1.725;
   } else if (activity === "Very active") {
+    return bmr * 1.725;
+  } else if (activity === "Athlete") {
     return bmr * 1.9;
   }
 };

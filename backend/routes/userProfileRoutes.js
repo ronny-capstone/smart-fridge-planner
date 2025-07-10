@@ -114,6 +114,7 @@ profileRoutes.post("/", (req, res) => {
     gender,
     activity,
   } = req.body;
+
   if (
     checkInvalidVariable(id) ||
     checkInvalidVariable(health_goal) ||
@@ -126,7 +127,7 @@ profileRoutes.post("/", (req, res) => {
     checkInvalidVariable(activity)
   ) {
     return res
-      .status(STATUS_CODES.BAD_REQUEST)
+      .status(StatusCodes.BAD_REQUEST)
       .json({ message: "Missing required fields" });
   }
 
@@ -146,7 +147,7 @@ profileRoutes.post("/", (req, res) => {
     db.get(
       "SELECT profile_completed FROM users WHERE id = ?",
       [id],
-      async (err, row) => {
+      (err, row) => {
         if (err) {
           return res
             .status(StatusCodes.INTERNAL_SERVER_ERROR)
@@ -164,12 +165,12 @@ profileRoutes.post("/", (req, res) => {
             gender,
             activity,
           };
-          updateProfile(id, profileInfo, res);
+          return updateProfile(id, profileInfo, res);
         } else {
           // Create a new user profile
           try {
             db.run(
-              `INSERT INTO users (id, health_goal, dietary_preferences, age, weight_kg, height_feet, height_inches, gender, activity, calorie_goal, protein_goal, carb_goal, fat_goal, bmr, tdee, profile_completed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              `INSERT INTO users (id, health_goal, dietary_preferences, age, weight_kg, height_feet, height_inches, gender, activity, calorie_goal, protein_goal, carb_goal, fat_goal, bmr, tdee, profile_completed) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
               [
                 id,
                 health_goal,
@@ -190,10 +191,14 @@ profileRoutes.post("/", (req, res) => {
               ],
               function (err) {
                 if (err) {
+                  console.error("DB insert error:", err);
                   return res
                     .status(StatusCodes.INTERNAL_SERVER_ERROR)
                     .json({ message: "Unable to sign up. Please try again" });
                 }
+                return res
+                  .status(StatusCodes.CREATED)
+                  .json({ message: "Profile creation successful!" });
               }
             );
           } catch (err) {
@@ -203,9 +208,6 @@ profileRoutes.post("/", (req, res) => {
             });
           }
         }
-        return res
-          .status(StatusCodes.CREATED)
-          .send("Profile creation successful!");
       }
     );
   } catch (err) {

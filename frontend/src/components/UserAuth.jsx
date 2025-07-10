@@ -26,7 +26,8 @@ export default function UserAuth({ onAuth }) {
       })
       .then((data) => {
         if (data.authenticated) {
-          onAuth();
+          // Not a new user
+          onAuth(false);
         }
         // If user not authenticated, stay on login form
       })
@@ -66,11 +67,33 @@ export default function UserAuth({ onAuth }) {
             setPassword("");
             alert("Signup successful");
           } else {
-            // User logs in, is authenticated
-            onAuth();
+            // Login successful, need to create profile
+            // Check if user has profile
+            fetch(`${API_BASE_URL}/auth/me`, {
+              method: "GET",
+              credentials: "include",
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                if (data.authenticated && data.user_id) {
+                  fetch(`${API_BASE_URL}/profile/${data.user_id}`, {
+                    credentials: "include",
+                  })
+                    .then((res) => {
+                      if (res.status === 404) {
+                        // User needs to create profile
+                        onAuth(true);
+                      } else {
+                        // Profile exists
+                        onAuth(false);
+                      }
+                    })
+                    .catch(() => {
+                      onAuth(true);
+                    });
+                }
+              });
           }
-        } else {
-          alert("Error authenticating account. Please try again");
         }
       })
       .catch((err) => {

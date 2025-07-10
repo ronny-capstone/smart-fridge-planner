@@ -9,4 +9,5 @@ export const AUTH_PATH = "/auth";
 export const LOGIN_PATH = "/login";
 export const ME_PATH = "/me";
 export const LOGOUT_PATH = "/logout";
-export const INVENTORY_PATH = "/inventory"
+export const INVENTORY_PATH = "/inventory";
+export const PROFILE_PATH = "/profile";
