@@ -28,6 +28,7 @@ export default function LogModal({
         })
         .then((data) => {
           const newFoodItem = {
+            spoonacular_id: data.id,
             name: data.name,
             calories: getNutrient(data.nutrition.nutrients, "Calories"),
             protein: getNutrient(data.nutrition.nutrients, "Protein"),
@@ -83,7 +84,7 @@ export default function LogModal({
             return (
               <div key={item.id}>
                 <button onClick={() => handleButtonClick(item)}>
-                  { item.name }
+                  {item.name}
                 </button>
               </div>
             );

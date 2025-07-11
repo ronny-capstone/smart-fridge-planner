@@ -4,16 +4,11 @@ import { API_BASE_URL } from "../utils/api";
 import { useEffect, useState } from "react";
 import { LOG_PATH, FOOD_PATH, AUTH_PATH } from "../utils/paths";
 
-export default function LogList() {
+export default function LogList({ currentUser }) {
   const [logs, setLogs] = useState([]);
   const [activeModal, setActiveModal] = useState(null);
   const [logToUpdate, setLogToUpdate] = useState(null);
   const [foodItems, setFoodItems] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
-
-  useEffect(() => {
-    fetchCurrentUser();
-  }, []);
 
   useEffect(() => {
     // Wait until we have currentUser to fetch logs
@@ -39,28 +34,6 @@ export default function LogList() {
         console.log(err.message);
       });
   }, []);
-
-  const fetchCurrentUser = () => {
-    fetch(`${API_BASE_URL}${AUTH_PATH}/me`, {
-      method: "GET",
-      credentials: "include",
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-      })
-      .then((data) => {
-        if (data && data.user_id) {
-          setCurrentUser(data.user_id);
-        } else {
-          console.log("No user_id in response");
-        }
-      })
-      .catch((err) => {
-        console.log("Failed to get current user:", err);
-      });
-  };
 
   const getFoodNameById = (itemId) => {
     const foodItem = foodItems.find((item) => item.id === itemId);

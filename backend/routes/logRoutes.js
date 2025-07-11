@@ -64,6 +64,23 @@ logRoutes.get("/:id", async (req, res) => {
   );
 });
 
+// Get all today's log entries for a user
+logRoutes.get("/:id/today", async (req, res) => {
+  const { id } = req.params;
+  db.all(
+    "SELECT * FROM consumption_logs WHERE user_id = ? AND date_logged = ?",
+    [id, new Date().toISOString().split("T")[0]],
+    async (err, rows) => {
+      if (err) {
+        return res
+          .status(StatusCodes.INTERNAL_SERVER_ERROR)
+          .send("Database error");
+      }
+      return res.status(StatusCodes.OK).json(rows);
+    }
+  );
+});
+
 // Get specific log entry by id
 logRoutes.get("/:id", async (req, res) => {
   const { id } = req.params;

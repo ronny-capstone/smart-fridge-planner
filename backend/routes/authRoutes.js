@@ -97,14 +97,14 @@ authRoutes.post(LOGIN_PATH, async (req, res) => {
         if (!row) {
           return res
             .status(StatusCodes.UNAUTHORIZED)
-            .send("Invalid username or password");
+            .json({ message: "Invalid username or password" });
         }
 
         const isValidPassword = await bcrypt.compare(password, row.password);
         if (!isValidPassword) {
           return res
             .status(StatusCodes.UNAUTHORIZED)
-            .send("Invalid username or password");
+            .json({ message: "Invalid username or password" });
         }
 
         // Store user ID and username in a session

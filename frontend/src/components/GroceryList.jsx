@@ -5,39 +5,10 @@ import { useEffect, useState } from "react";
 import { API_BASE_URL } from "../utils/api";
 import { AUTH_PATH, GROCERY_PATH } from "../utils/paths";
 
-export default function GroceryList() {
+export default function GroceryList({ currentUser }) {
   const [groceries, setGroceries] = useState([]);
   const [activeModal, setActiveModal] = useState(false);
   const [groceryToUpdate, setGroceryToUpdate] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
-
-  // When component first loads, fetch grocies
-  useEffect(() => {
-    fetchCurrentUser();
-  }, []);
-
-  const fetchCurrentUser = () => {
-    fetch(`${API_BASE_URL}${AUTH_PATH}/me`, {
-      method: "GET",
-      credentials: "include",
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-      })
-      .then((data) => {
-        if (data.authenticated && data.user_id) {
-          setCurrentUser(data.user_id);
-          fetchGroceries(data.user_id);
-        } else {
-          console.log("User not logged in:", data.message);
-        }
-      })
-      .catch((err) => {
-        console.log("Failed to get current user:", err);
-      });
-  };
 
   const fetchGroceries = (userId) => {
     fetch(`${API_BASE_URL}${GROCERY_PATH}?user_id=${userId}`)

@@ -42,6 +42,7 @@ db.serialize(() => {
 
   db.run(`CREATE TABLE IF NOT EXISTS food_items (
           id INTEGER PRIMARY KEY,
+          spoonacular_id INTEGER NOT NULL,
           name TEXT NOT NULL,
           calories INTEGER NOT NULL,
           protein REAL NOT NULL,

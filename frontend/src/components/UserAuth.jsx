@@ -94,6 +94,14 @@ export default function UserAuth({ onAuth }) {
                 }
               });
           }
+        } else {
+          if (response.status === 401) {
+            if (isSignUp) {
+              alert("Error creating account. Please try again");
+            } else {
+              alert("Invalid username or password");
+            }
+          }
         }
       })
       .catch((err) => {

@@ -3,7 +3,7 @@ import { API_BASE_URL } from "../utils/api";
 import { PROFILE_PATH, AUTH_PATH } from "../utils/paths";
 import { checkInvalidVariable } from "../utils/invalidVars";
 
-export default function ProfileForm({ profileSubmit }) {
+export default function ProfileForm({ profileSubmit, currentUser }) {
   // Determines if user is updating an existing profile or creating new one
   const [isUpdating, setIsUpdating] = useState(false);
   const [heightFeet, setHeightFeet] = useState("");
@@ -14,37 +14,6 @@ export default function ProfileForm({ profileSubmit }) {
   const [activityLevel, setActivityLevel] = useState("");
   const [healthGoal, setHealthGoal] = useState("");
   const [dietaryPreferences, setDietaryPreferences] = useState("");
-  // User id for logged in user
-  const [currentUser, setCurrentUser] = useState(null);
-
-  // When loads, fetch current user's authentication status
-  useEffect(() => {
-    fetchCurrentUser();
-  }, []);
-
-  const fetchCurrentUser = () => {
-    fetch(`${API_BASE_URL}${AUTH_PATH}/me`, {
-      method: "GET",
-      credentials: "include",
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          throw new Error("Authentication error");
-        }
-      })
-      .then((data) => {
-        if (data.authenticated && data.user_id) {
-          setCurrentUser(data.user_id);
-        } else {
-          console.log("User not logged in:", data.message);
-        }
-      })
-      .catch((err) => {
-        console.log("Failed to get current user:", err);
-      });
-  };
 
   // When currentUser is set, determine if user is logging in / signing up
   useEffect(() => {

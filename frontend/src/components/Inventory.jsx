@@ -7,39 +7,10 @@ import { getDaysUntilExpiration } from "../utils/dateUtils";
 import { API_BASE_URL } from "../utils/api";
 import { AUTH_PATH, INVENTORY_PATH } from "../utils/paths";
 
-export default function Inventory() {
+export default function Inventory({ currentUser }) {
   const [inventory, setInventory] = useState([]);
   const [activeModal, setActiveModal] = useState(false);
   const [groceryToUpdate, setGroceryToUpdate] = useState(null);
-  const [currentUser, setCurrentUser] = useState(null);
-
-  // When component first loads, fetch grocies
-  useEffect(() => {
-    fetchCurrentUser();
-  }, []);
-
-  const fetchCurrentUser = () => {
-    fetch(`${API_BASE_URL}${AUTH_PATH}/me`, {
-      method: "GET",
-      credentials: "include",
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-      })
-      .then((data) => {
-        if (data.authenticated && data.user_id) {
-          setCurrentUser(data.user_id);
-          fetchInventory(data.user_id);
-        } else {
-          console.log("User not logged in:", data.message);
-        }
-      })
-      .catch((err) => {
-        console.log("Failed to get current user:", err);
-      });
-  };
 
   const fetchInventory = (userId) => {
     fetch(`${API_BASE_URL}${INVENTORY_PATH}?user_id=${userId}`)
