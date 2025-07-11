@@ -7,6 +7,7 @@ import UserAuth from "./components/UserAuth";
 import Inventory from "./components/Inventory";
 import ProfileForm from "./components/ProfileForm";
 import NutritionDisplay from "./components/NutritionDisplay";
+import MealRecForm from "./components/MealRecForm";
 import { API_BASE_URL } from "./utils/api";
 import { AUTH_PATH } from "./utils/paths";
 
@@ -115,6 +116,7 @@ function App() {
                 <FoodItemList />
                 <GroceryList currentUser={currentUser} />
                 <Inventory currentUser={currentUser} />
+                <MealRecForm currentUser={currentUser} />
               </div>
             )}
           </>
