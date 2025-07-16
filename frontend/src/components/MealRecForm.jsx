@@ -1,41 +1,30 @@
 import { useState, useEffect } from "react";
 import { API_BASE_URL } from "../utils/api";
-import { PROFILE_PATH, RECIPES_PATH } from "../utils/paths";
-import { cuisinesList, typeList } from "../utils/mealFilters";
+import { RECIPES_PATH, PROFILE_PATH } from "../utils/paths";
+import { cuisinesList } from "../utils/mealFilters";
 
-export default function MealRecForm({ currentUser, inventory }) {
-  const [cuisine, setCuisine] = useState("");
-  const [diet, setDiet] = useState("");
-  const [type, setType] = useState("");
-  const [minCarbs, setMinCarbs] = useState(0);
-  const [maxCarbs, setMaxCarbs] = useState(0);
-  const [minProtein, setMinProtein] = useState(0);
-  const [maxProtein, setMaxProtein] = useState(0);
-  const [minCalories, setMinCalories] = useState(0);
-  const [maxCalories, setMaxCalories] = useState(0);
-  const [minFat, setMinFat] = useState(0);
-  const [maxFat, setMaxFat] = useState(0);
-
-  const [recipes, setRecipes] = useState([]);
-  // Set if search led to no recipes
-  const [noResults, setNoResults] = useState(false);
-  // Set whether a search is in progress
-  const [isSearching, setIsSearching] = useState(false);
-  const [selectedInventoryItems, setSelectedInventoryItems] = useState([]);
-
-  const nutritionParams = {
-    cuisine,
-    diet,
-    type,
-    minCarbs,
-    maxCarbs,
-    minProtein,
-    maxProtein,
-    minCalories,
-    maxCalories,
-    minFat,
-    maxFat,
-  };
+export default function MealRecForm({ currentUser }) {
+  const [form, setForm] = useState({
+    recipes: [],
+    result: null,
+    noResults: false,
+    isSearching: false,
+    ingredientType: "exact",
+    prioritizeExpiring: false,
+    selectedPriority: "balanced",
+    cuisine: "",
+    diet: "",
+    useDiet: true,
+    maxPrepTime: "",
+    minCarbs: 0,
+    maxCarbs: 0,
+    minProtein: 0,
+    maxProtein: 0,
+    minCalories: 0,
+    maxCalories: 0,
+    minFat: 0,
+    maxFat: 0,
+  });
 
   // Fetch user's diet from profile
   useEffect(() => {
@@ -52,131 +41,187 @@ export default function MealRecForm({ currentUser, inventory }) {
         }
       })
       .then((data) => {
-        setDiet(data.profile.dietary_preferences);
+        setForm((prev) => ({
+          ...prev,
+          useDiet: true,
+          diet: data.profile.dietary_preferences,
+        }));
       })
       .catch((err) => {
-        setDiet("");
+        setForm((prev) => ({ ...prev, useDiet: false, diet: "" }));
       });
   }, [currentUser]);
 
-  const handleItemToggle = (item) => {
-    setSelectedInventoryItems((prev) => {
-      // Search through selected items, check if selected
-      if (prev.find((selected) => selected.id === item.id)) {
-        // Remove if already selected (unselect)
-        return prev.filter((selected) => selected.id !== item.id);
-      } else {
-        // Add item if not selected
-        return [...prev, item];
-      }
-    });
-  };
-
-  const handleSubmit = (e) => {
-    // Stops page from refreshing
-    e.preventDefault();
-    setIsSearching(true);
-    setNoResults(false);
-    setRecipes([]);
-    try {
-      const params = new URLSearchParams();
-      Object.entries(nutritionParams).forEach(([key, value]) => {
-        if (value) {
-          params.append(key, value);
-        }
-      });
-
-      if (selectedInventoryItems.length > 0) {
-        const ingredients = selectedInventoryItems
-          .map((item) => item.name)
-          .join(",");
-        params.append("includeIngredients", ingredients);
-      }
-
-      fetch(`${API_BASE_URL}${RECIPES_PATH}?${params}`)
-        .then((response) => response.json())
-        .then((data) => {
-          setIsSearching(true);
-          setNoResults(false);
-          setRecipes([]);
-          if (data.totalResults === 0 || data.recipes.length === 0) {
-            setNoResults(true);
-            setRecipes([]);
-          } else if (data) {
-            setRecipes(data.recipes);
-            setNoResults(false);
-          } else {
-            alert("Failed to get meal recommendations");
-          }
-          setIsSearching(false);
-        })
-        .catch((err) => {
-          alert(`Failed to get meal recommendations`);
-        });
-    } catch (err) {
-      alert(`Failed to get meal recommendations`);
-    }
+  const clearResults = () => {
+    setForm((prev) => ({
+      ...prev,
+      recipes: [],
+      result: null,
+      noResults: false,
+    }));
   };
 
   const clearForm = () => {
-    setCuisine("");
-    setType("");
-    setRecipes("");
-    setMinCarbs(0);
-    setMaxCarbs(0);
-    setMinProtein(0);
-    setMaxProtein(0);
-    setMinCalories(0);
-    setMaxCalories(0);
-    setMinFat(0);
-    setMaxFat(0);
-    setSelectedInventoryItems([]);
-    setNoResults(false);
-    setIsSearching(false);
+    setForm((prev) => ({
+      ...prev,
+      cuisine: "",
+      minCarbs: 0,
+      maxCarbs: 0,
+      minProtein: 0,
+      maxProtein: 0,
+      minCalories: 0,
+      maxCalories: 0,
+      minFat: 0,
+      maxFat: 0,
+      noResults: false,
+      isSearching: false,
+      maxPrepTime: "",
+      prioritizeExpiring: false,
+      ingredientType: "exact",
+      selectedPriority: "balanced",
+      result: null,
+      recipes: [],
+    }));
   };
 
+  const handleChange = (e) => {
+    const { name, type, checked, value } = e.target;
+    setForm((prevForm) => ({
+      ...prevForm,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setForm((prev) => ({ ...prev, isSearching: true, noResults: false }));
+    const params = new URLSearchParams();
+    const queryParams = {
+      ingredientType: form.ingredientType,
+      maxPrepTime: form.maxPrepTime,
+      cuisine: form.cuisine,
+      minCalories: form.minCalories,
+      maxCalories: form.maxCalories,
+      minCarbs: form.minCarbs,
+      maxCarbs: form.maxCarbs,
+      minProtein: form.minProtein,
+      maxProtein: form.maxProtein,
+      minFat: form.minFat,
+      maxFat: form.maxFat,
+      expirationToggle: form.prioritizeExpiring,
+      priority: form.selectedPriority,
+      useDiet: form.useDiet,
+    };
+
+    Object.entries(queryParams).forEach(([key, value]) => {
+      // Append only if value exists
+      if (value !== undefined && value !== null && value !== "") {
+        params.append(key, value);
+      }
+    });
+
+    fetch(
+      `${API_BASE_URL}${RECIPES_PATH}/recommendations/${currentUser}?${params}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setForm((prev) => ({
+          ...prev,
+          recipes: data.recipes,
+          result: {
+            type: "recommendations",
+            recipeCount: data.numFound,
+            message: data.message,
+            ingredientType: data.ingredientType,
+          },
+          noResults: data.recipes.length === 0,
+          isSearching: false,
+        }));
+      })
+      .catch((err) => {
+        alert("Failed to get recipe recommendations");
+        setForm((prev) => ({ ...prev, isSearching: false }));
+      });
+  };
+
+  console.log(form.recipes);
+
   return (
-    <form onSubmit={handleSubmit}>
+    <div>
+      <h1>Meal Recommendation</h1>
+
       <div>
-        <h1>Meal Recommendation</h1>
+        <label>Meal Prioritization:</label>
+        <select
+          name="selectedPriority"
+          value={form.selectedPriority}
+          onChange={handleChange}
+        >
+          <option value="balanced">Balanced</option>
+          <option value="quickMeals">Quick Meals</option>
+          <option value="fitnessGoals">Fitness Goals</option>
+          <option value="reduceWaste">Reduce Waste</option>
+          <option value="cuisineExplorer">Cuisine Explorer</option>
+        </select>
+      </div>
+      <div>
+        <label>
+          Recipe Ingredients:
+          <select
+            name="ingredientType"
+            value={form.ingredientType}
+            onChange={handleChange}
+          >
+            <option value="exact">Use only what I have</option>
+            <option value="partial">Allow missing ingredients</option>
+          </select>
+        </label>
 
-        <div>
-          <p>Ingredients To Include</p>
-          <label>Select Ingredients From Your Inventory</label>
-          {inventory.length === 0 ? (
-            <p>No items in your inventory</p>
-          ) : (
-            <div>
-              {inventory.map((item) => (
-                <div key={item.id} onClick={() => handleItemToggle(item)}>
-                  <p className="bg-blue-100">{item.name}</p>
-                  <p>Quantity: {item.quantity}</p>
-                  <p>Expires: {item.expiration_date}</p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {selectedInventoryItems.length > 0 && (
+        {form.diet !== "None" && (
           <div>
-            <p>Selected from inventory:</p>
-            {selectedInventoryItems.map((item) => (
-              <div key={item.id}>
-                <p>{item.name}</p>
-                <button onClick={() => handleItemToggle(item)}>Remove</button>
-              </div>
-            ))}
+            <label>
+              <input
+                name="useDiet"
+                type="checkbox"
+                checked={form.useDiet}
+                onChange={handleChange}
+              />
+              Apply Diet Filter ({form.diet}):
+            </label>
           </div>
         )}
 
         <div>
-          <p>Cuisine</p>
+          <label>
+            Prioritize Expiring Items:
+            <input
+              name="prioritizeExpiring"
+              type="checkbox"
+              checked={form.prioritizeExpiring}
+              onChange={handleChange}
+            />
+          </label>
+        </div>
+
+        <div>
+          <label>
+            Meal Prep Time (minutes):
+            <input
+              name="maxPrepTime"
+              type="number"
+              value={form.maxPrepTime}
+              onChange={handleChange}
+            />
+          </label>
+        </div>
+
+        <label>
+          Cuisine:
           <select
             name="cuisine"
-            value={cuisine}
+            value={form.cuisine}
+            onChange={handleChange}
             placeholder={"Cuisine"}
-            onChange={(e) => setCuisine(e.target.value)}
           >
             <option value="">Select Cuisine</option>
             <option value={""}>No preference</option>
@@ -186,30 +231,7 @@ export default function MealRecForm({ currentUser, inventory }) {
               </option>
             ))}
           </select>
-        </div>
-
-        <div>
-          <p>Diet</p>
-          <p>Following diet: {diet}</p>
-        </div>
-
-        <div>
-          <p>Meal Type</p>
-          <select
-            name="mealType"
-            value={type}
-            onChange={(e) => setType(e.target.value)}
-          >
-            <option value="">Select meal type</option>
-            <option value={""}>No preference</option>
-
-            {typeList.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-        </div>
+        </label>
 
         <div>
           <p>Nutrition Filters</p>
@@ -221,8 +243,8 @@ export default function MealRecForm({ currentUser, inventory }) {
                 type="number"
                 min="0"
                 name="minCalories"
-                value={minCalories || ""}
-                onChange={(e) => setMinCalories(e.target.value)}
+                value={form.minCalories || ""}
+                onChange={handleChange}
               />
             </div>
             <div>
@@ -231,8 +253,8 @@ export default function MealRecForm({ currentUser, inventory }) {
                 type="number"
                 min="0"
                 name="maxCalories"
-                value={maxCalories || ""}
-                onChange={(e) => setMaxCalories(e.target.value)}
+                value={form.maxCalories || ""}
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -247,8 +269,8 @@ export default function MealRecForm({ currentUser, inventory }) {
                 type="number"
                 min="0"
                 name="minProtein"
-                value={minProtein || ""}
-                onChange={(e) => setMinProtein(e.target.value)}
+                value={form.minProtein || ""}
+                onChange={handleChange}
               />
             </div>
             <div>
@@ -257,8 +279,8 @@ export default function MealRecForm({ currentUser, inventory }) {
                 type="number"
                 min="0"
                 name="maxProtein"
-                value={maxProtein || ""}
-                onChange={(e) => setMaxProtein(e.target.value)}
+                value={form.maxProtein || ""}
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -273,8 +295,8 @@ export default function MealRecForm({ currentUser, inventory }) {
                 type="number"
                 min="0"
                 name="minCarbs"
-                value={minCarbs || ""}
-                onChange={(e) => setMinCarbs(e.target.value)}
+                value={form.minCarbs || ""}
+                onChange={handleChange}
               />
             </div>
             <div>
@@ -283,8 +305,8 @@ export default function MealRecForm({ currentUser, inventory }) {
                 type="number"
                 min="0"
                 name="maxCarbs"
-                value={maxCarbs || ""}
-                onChange={(e) => setMaxCarbs(e.target.value)}
+                value={form.maxCarbs || ""}
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -299,8 +321,8 @@ export default function MealRecForm({ currentUser, inventory }) {
                 type="number"
                 min="0"
                 name="minFat"
-                value={minFat || ""}
-                onChange={(e) => setMinFat(e.target.value)}
+                value={form.minFat || ""}
+                onChange={handleChange}
               />
             </div>
             <div>
@@ -309,8 +331,8 @@ export default function MealRecForm({ currentUser, inventory }) {
                 type="number"
                 min="0"
                 name="maxFat"
-                value={maxFat || ""}
-                onChange={(e) => setMaxFat(e.target.value)}
+                value={form.maxFat || ""}
+                onChange={handleChange}
               />
             </div>
           </div>
@@ -322,28 +344,93 @@ export default function MealRecForm({ currentUser, inventory }) {
           </button>
         </div>
 
-        <div className="mb-1 w-full max-w-sm">
-          <button type="submit">Suggest Meal</button>
-        </div>
-
-        {recipes.length > 0 && (
-          <div>
-            <h2> Recipe Recommendations ({recipes.length}) </h2>
-            {recipes.map((recipe) => (
-              <div key={recipe.id}>
-                <img src={recipe.image} alt={recipe.title} />
-                <p> {recipe.title} </p>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {noResults && !isSearching && (
-          <div>
-            <p> No recipes found, try adjusting search crieteria. </p>
-          </div>
+        {form.recipes.length > 0 && (
+          <button type="button" onClick={clearResults}>
+            Clear Results
+          </button>
         )}
       </div>
-    </form>
+
+      <div className="mb-1 w-full max-w-sm">
+        <button type="submit" onClick={handleSubmit}>
+          Suggest Meal
+        </button>
+      </div>
+
+      {form.result && !form.isSearching && (
+        <div>
+          <p>{form.result.message}</p>
+          {form.result.type === "exact" && (
+            <p>Using {form.result.itemsUsed} items from your inventory</p>
+          )}
+          {form.result.type === "partial" && (
+            <p>
+              Recipes with up to {form.result.maxMissing} missing ingredients
+            </p>
+          )}
+
+          {form.result.type === "expiring" && form.result.expiringItems && (
+            <div>
+              <p>Using items expiring soon:</p>
+              {form.result.expiringItems.map((item) => (
+                <p key={item.name}>
+                  {item.name} - {item.numDaysExpiring} days to expiration
+                </p>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {form.recipes.length > 0 && !form.isSearching && (
+        <div>
+          <h2> Recipe Recommendations ({form.recipes.length}) </h2>
+          {form.recipes.map((recipe) => (
+            <div key={recipe.id}>
+              <img src={recipe.image} alt={recipe.title} />
+              <p> {recipe.title} </p>
+              <p>Match Score: {recipe.totalScore}% match</p>
+              <p>Prep time: {recipe.readyInMinutes} minutes</p>
+              {recipe.cuisines.length !== 0 && (
+                <p>Cuisines: {recipe.cuisines.join(", ")}</p>
+              )}
+              <p>
+                {recipe.usedIngredients.length || 0} ingredients used from
+                inventory
+              </p>
+              <p>
+                {recipe.missedIngredients.length > 0 && (
+                  <>
+                    {" "}
+                    {recipe.missedIngredients.length} missing (
+                    {recipe.missedIngredients.map((ing) => ing.name).join(", ")}
+                    )
+                  </>
+                )}
+              </p>
+
+              {recipe.usedExpiringIngredients && (
+                <>
+                  <p>Uses {recipe.usedExpiringIngredients} expiring items</p>
+                  <ul>
+                    {recipe.usedExpiringIngredients.map((item, index) => (
+                      <li key={index}>
+                        {item.name} - expires in {item.daysUntilExpire} days
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {form.noResults && !form.isSearching && (
+        <div>
+          <p> No recipes found, try adjusting search criteria. </p>
+        </div>
+      )}
+    </div>
   );
 }

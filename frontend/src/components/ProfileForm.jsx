@@ -212,9 +212,8 @@ export default function ProfileForm({ profileSubmit, currentUser }) {
             <option value={"None"}>None</option>
             <option value={"Vegetarian"}>Vegetarian</option>
             <option value={"Vegan"}>Vegan</option>
-            <option value={"Gluten-free"}>Gluten-free</option>
-            <option value={"Dairy-free"}>Dairy-free</option>
-            <option value={"Pescatarian"}>Pescatarian</option>
+            <option value={"Gluten free"}>Gluten-free</option>
+            <option value={"Ketogenic"}>Ketogenic</option>
           </select>
         </div>
 

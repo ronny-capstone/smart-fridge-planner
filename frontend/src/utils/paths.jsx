@@ -12,3 +12,5 @@ export const LOGOUT_PATH = "/logout";
 export const INVENTORY_PATH = "/inventory";
 export const PROFILE_PATH = "/profile";
 export const RECIPES_PATH = "/recipes";
+export const EXACT_PATH = "/exact";
+export const PARTIAL_PATH = "/partial"

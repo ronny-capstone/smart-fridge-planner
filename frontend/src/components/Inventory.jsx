@@ -28,9 +28,9 @@ export default function Inventory({
           return {
             ...grocery,
             item_id: updatedGrocery.item.id,
-            food_name: updatedGrocery.item.name,
+            name: updatedGrocery.item.name,
             quantity: updatedGrocery.item.quantity,
-            expirationDate: updatedGrocery.item.expiration_date,
+            expiration_date: updatedGrocery.item.expiration_date,
           };
         }
         return grocery;
