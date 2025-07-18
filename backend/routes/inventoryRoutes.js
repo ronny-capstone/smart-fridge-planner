@@ -59,12 +59,10 @@ inventoryRoutes.post("/", async (req, res) => {
           quantity: quantity,
           expiration_date: expiration_date,
         };
-        return res
-          .status(StatusCodes.CREATED)
-          .json({
-            message: "Created food item for inventory",
-            item: insertedItem,
-          });
+        return res.status(StatusCodes.CREATED).json({
+          message: "Created food item for inventory",
+          item: insertedItem,
+        });
       }
     );
   } catch (err) {
@@ -177,5 +175,6 @@ inventoryRoutes.delete("/:id", async (req, res) => {
       .json({ error: "An error occurred while deleting a food item" });
   }
 });
+
 
 module.exports = inventoryRoutes;

@@ -8,6 +8,7 @@ import Inventory from "./components/Inventory";
 import ProfileForm from "./components/ProfileForm";
 import NutritionDisplay from "./components/NutritionDisplay";
 import MealRecForm from "./components/MealRecForm";
+import GroceryRecForm from "./components/GroceryRecForm";
 import { API_BASE_URL } from "./utils/api";
 import { AUTH_PATH, INVENTORY_PATH } from "./utils/paths";
 
@@ -152,6 +153,7 @@ function App() {
                   handleInventoryUpdate={fetchInventory}
                 />
                 <MealRecForm currentUser={currentUser} />
+                <GroceryRecForm currentUser={currentUser} inventory={inventory}/>
               </div>
             )}
           </>
