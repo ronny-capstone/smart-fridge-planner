@@ -14,3 +14,5 @@ export const PROFILE_PATH = "/profile";
 export const RECIPES_PATH = "/recipes";
 export const EXACT_PATH = "/exact";
 export const PARTIAL_PATH = "/partial"
+export const GENERATE_PATH = "/generate"
+export const GROCERY_LIST_PATH = "/groceryList"

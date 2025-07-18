@@ -11,10 +11,12 @@ const PROFILE_PATH = "/profile";
 const RECIPES_PATH = "/recipes";
 const INVENTORY_PATH = "/inventory";
 const REC_PATH = "/recommendations";
-const MAP_PATH = "/mapProducts";
+const COST_PATH = "/cost";
 const PRODUCTS_PATH = "/products";
-const GENERATE_PATH = "/generate";
 const GROCERY_LIST_PATH = "/groceryList";
+const INGREDIENTS_PATH = "/ingredients";
+const INFORMATION_PATH = "/information";
+const GENERATE_PATH = "/generate";
 
 module.exports = {
   SIGNUP_PATH,
@@ -30,8 +32,10 @@ module.exports = {
   RECIPES_PATH,
   INVENTORY_PATH,
   REC_PATH,
-  MAP_PATH,
   PRODUCTS_PATH,
-  GENERATE_PATH,
+  COST_PATH,
   GROCERY_LIST_PATH,
+  INGREDIENTS_PATH,
+  INFORMATION_PATH,
+  GENERATE_PATH,
 };

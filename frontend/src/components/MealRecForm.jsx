@@ -144,8 +144,6 @@ export default function MealRecForm({ currentUser }) {
       });
   };
 
-  console.log(form.recipes);
-
   return (
     <div>
       <h1>Meal Recommendation</h1>
