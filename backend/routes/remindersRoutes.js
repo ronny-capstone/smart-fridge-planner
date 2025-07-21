@@ -83,28 +83,29 @@ remindersRoutes.post("/", (req, res) => {
   }
 });
 
-// Delete reminder
-remindersRoutes.delete("/:id", async (req, res) => {
+// Delete all user's dismissed reminders
+remindersRoutes.delete("/", async (req, res) => {
   try {
-    const { id } = req.params;
-    db.get("SELECT id FROM reminders WHERE id = ?", [id], (err, row) => {
-      if (err) {
-        return res
-          .status(StatusCodes.INTERNAL_SERVER_ERROR)
-          .json({ message: "Error deleting reminder" });
-      }
-      if (!row) {
-        return res.status(StatusCodes.NOT_FOUND).send("Reminder not found");
-      }
-      db.run(`DELETE FROM reminders WHERE id = ?`, [id], function (err) {
+    const { user_id } = req.query;
+    if (!user_id) {
+      return res
+        .status(StatusCodes.BAD_REQUEST)
+        .json({ message: "User ID is required" });
+    }
+    db.run(
+      `DELETE FROM reminders WHERE user_id = ?`,
+      [user_id],
+      function (err) {
         if (err) {
           return res
             .status(StatusCodes.INTERNAL_SERVER_ERROR)
-            .json({ message: "Error deleting reminder" });
+            .json({ message: "Error deleting reminders" });
         }
-        return res.status(StatusCodes.OK).json({ message: "Reminder deleted" });
-      });
-    });
+        return res
+          .status(StatusCodes.OK)
+          .json({ message: "All reminders deleted" });
+      }
+    );
   } catch (err) {
     res
       .status(StatusCodes.INTERNAL_SERVER_ERROR)

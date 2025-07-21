@@ -1,0 +1,9 @@
+export const STOCK_CONSTANTS = {
+  LOW_STOCK: 2,
+};
+
+export const EXPIRATION_CONSTANTS = {
+  EXPIRES_TODAY: 0,
+  EXPIRES_TOMORROW: 1,
+  EXPIRES_SOON: 3,
+};

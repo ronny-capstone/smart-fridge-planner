@@ -17,8 +17,6 @@ export const listToString = (listObject, optionalListObject) => {
   let optionalString = "\n";
   if (optionalListObject.length > 0) {
     optionalListObject.forEach((item) => {
-      console.log("Item: ", item);
-      console.log("Reason: ", item.reason, typeof item.reason);
       optionalString += item.name + " - " + item.reason + "\n";
     });
 

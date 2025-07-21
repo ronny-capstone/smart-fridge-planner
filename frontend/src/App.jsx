@@ -10,7 +10,7 @@ import NutritionDisplay from "./components/NutritionDisplay";
 import MealRecForm from "./components/MealRecForm";
 import GroceryRecForm from "./components/GroceryRecForm";
 import { API_BASE_URL } from "./utils/api";
-import { AUTH_PATH, INVENTORY_PATH } from "./utils/paths";
+import { AUTH_PATH, INVENTORY_PATH, REMINDERS_PATH } from "./utils/paths";
 import { ToastContainer } from "react-toastify";
 import { checkExpiringItems, checkLowStock } from "./utils/inventoryReminders";
 
@@ -88,6 +88,7 @@ function App() {
       });
   };
 
+  // Get reminders based on inventory
   useEffect(() => {
     if (
       isAuthenticated &&
@@ -100,6 +101,27 @@ function App() {
       setHasShownReminders(true);
     }
   }, [isAuthenticated, inventory, hasShownReminders]);
+
+  // Bring back reminders the user chose to hide
+  const resetHiddenReminders = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}${REMINDERS_PATH}?user_id=${currentUser}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+      if (response.ok) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      console.log("Failed to reset reminders");
+      return false;
+    }
+  };
 
   const handleLogout = () => {
     fetch(`${API_BASE_URL}/auth/logout`, {
@@ -135,12 +157,23 @@ function App() {
           <>
             <div>
               <button onClick={() => setShowProfileForm(!showProfileForm)}>
-                {showProfileForm ? "Dismiss Profile" : "Manage Profile"}
+                {showProfileForm ? "Dismiss Profile" : "👤 Manage Profile"}
               </button>
               <button onClick={() => setShowGoals(!showGoals)}>
                 {showGoals
                   ? "Hide Nutrition Targets"
-                  : "View Nutrition Targets"}
+                  : "🎯 View Nutrition Targets"}
+              </button>
+              <button
+                onClick={async () => {
+                  const success = await resetHiddenReminders(currentUser);
+                  if (success) {
+                    checkExpiringItems(inventory, currentUser);
+                    checkLowStock(inventory, currentUser);
+                  }
+                }}
+              >
+                🔔 Reset Dismissed Reminders
               </button>
               <button onClick={handleLogout}> Log out</button>
             </div>
