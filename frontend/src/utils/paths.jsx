@@ -18,3 +18,4 @@ export const GENERATE_PATH = "/generate";
 export const GROCERY_LIST_PATH = "/groceryList";
 export const EXPORT_PATH = "/export-groceries";
 export const REMINDERS_PATH = "/reminders";
+export const WEEK_PATH = "/weekly-plan";

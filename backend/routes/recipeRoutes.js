@@ -14,10 +14,11 @@ const INGREDIENTS_PATH = "/findByIngredients";
 const EXACT_PATH = "/exact";
 const PARTIAL_PATH = "/partial";
 const REC_PATH = "/recommendations";
-const { EXPIRING_PATH } = require("../utils/backend_paths.js");
+const { EXPIRING_PATH, WEEK_PATH } = require("../utils/backend_paths.js");
 const { getDaysUntilExpiration } = require("../utils/dateUtils.js");
 const {
   recipeRecommendation,
+  generateWeekMealPlan,
 } = require("../recommendation/recipeRecommendation.js");
 
 // Filter recipes
@@ -457,6 +458,102 @@ recipeRoutes.get(`${REC_PATH}/:userId`, (req, res) => {
             return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
               success: false,
               message: "Error getting recommendations",
+            });
+          }
+        }
+      );
+    }
+  );
+});
+
+// Get week's worth of recipes
+recipeRoutes.get(`${WEEK_PATH}/:userId`, (req, res) => {
+  const { userId } = req.params;
+  const {
+    ingredientType = "exact",
+    expirationToggle = "false",
+    priority = "balanced",
+    maxPrepTime,
+    cuisine,
+    minCalories,
+    maxCalories,
+    minProtein,
+    maxProtein,
+    minCarbs,
+    maxCarbs,
+    minFat,
+    maxFat,
+  } = req.query;
+
+  db.all(
+    `SELECT * FROM inventory WHERE user_id = ?`,
+    [userId],
+    async (err, inventory) => {
+      if (err) {
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+          success: false,
+          message: "Error fetching inventory items",
+        });
+      }
+
+      if (inventory.length === 0) {
+        return res.json({
+          success: true,
+          recipes: [],
+          expiringItems: [],
+          message: "No inventory items",
+        });
+      }
+
+      db.get(
+        `SELECT * FROM users WHERE id = ?`,
+        [userId],
+        async (err, profile) => {
+          if (err) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+              success: false,
+              message: "Error getting user profile",
+            });
+          }
+
+          if (!profile) {
+            return res.status(StatusCodes.NOT_FOUND).json({
+              success: false,
+              message: "User profile not found",
+            });
+          }
+
+          try {
+            const userFilters = {
+              expirationToggle: expirationToggle === "true",
+              maxPrepTime: maxPrepTime ? parseInt(maxPrepTime) : null,
+              cuisine: cuisine ? cuisine : null,
+              minCalories: minCalories ? parseInt(minCalories) : null,
+              maxCalories: maxCalories ? parseInt(maxCalories) : null,
+              minProtein: minProtein ? parseInt(minProtein) : null,
+              maxProtein: maxProtein ? parseInt(maxProtein) : null,
+              minCarbs: minCarbs ? parseInt(minCarbs) : null,
+              maxCarbs: maxCarbs ? parseInt(maxCarbs) : null,
+              minFat: minFat ? parseInt(minFat) : null,
+              maxFat: maxFat ? parseInt(maxFat) : null,
+              priority: priority ? priority : "balanced",
+            };
+
+            const weeklyRecommendations = await generateWeekMealPlan(
+              userFilters,
+              profile,
+              inventory
+            );
+
+            return res.json({
+              success: true,
+              ...weeklyRecommendations,
+              userId,
+            });
+          } catch (error) {
+            return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+              success: false,
+              message: "Error getting weekly meals",
             });
           }
         }

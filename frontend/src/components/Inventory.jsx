@@ -5,6 +5,7 @@ import { useState } from "react";
 import { getDaysUntilExpiration } from "../utils/dateUtils";
 import { API_BASE_URL } from "../utils/api";
 import { INVENTORY_PATH } from "../utils/paths";
+import { toast } from "react-toastify";
 
 export default function Inventory({ currentUser, inventory, setInventory }) {
   const [activeModal, setActiveModal] = useState(false);
@@ -45,15 +46,14 @@ export default function Inventory({ currentUser, inventory, setInventory }) {
               inventory.filter((grocery) => grocery.id !== groceryToDelete.id)
             );
           } else {
-            alert(`Error deleting item: ${response.json().error}`);
+            toast.error(`Error deleting item`);
           }
         })
         .catch((err) => {
-          console.log("Failed to delete grocery item:", err);
-          alert("Error deleting grocery item. Please try again");
+          toast.error("Error deleting grocery item. Please try again");
         });
     } catch (err) {
-      alert("Failed to delete grocery item:", err.message);
+      toast.error("Failed to delete grocery item");
     }
   };
 

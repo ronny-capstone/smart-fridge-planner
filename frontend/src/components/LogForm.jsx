@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { API_BASE_URL } from "../utils/api";
 import { FOOD_PATH } from "../utils/paths";
+import { toast } from "react-toastify";
 
 export default function LogForm({
   handleLogAdded,
@@ -8,7 +9,7 @@ export default function LogForm({
   setShowModal,
   type,
   logToUpdate,
-  currentUser
+  currentUser,
 }) {
   const [dateLogged, setDateLogged] = useState(
     new Date().toISOString().split("T")[0]
@@ -25,7 +26,7 @@ export default function LogForm({
         setFoodItems(data);
       })
       .catch((err) => {
-        console.log("Failed to fetch food items:", err);
+        toast.error("Unable to load food items˝");
         setFoodItems([]);
       });
   }, []);
@@ -37,7 +38,7 @@ export default function LogForm({
         setFoodItems(data);
       })
       .catch((err) => {
-        console.log("Failed to fetch food items:", err);
+        toast.error("Unable to load food items˝");
         setFoodItems([]);
       });
   }, []);
@@ -113,7 +114,7 @@ export default function LogForm({
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (foodItem === "" || servings === "") {
-      alert("Please fill out all fields.");
+      toast.error("Please fill out all fields.");
       return;
     }
     if (
@@ -121,7 +122,7 @@ export default function LogForm({
       !Number.isInteger(parseInt(servings)) ||
       parseInt(servings) <= 0
     ) {
-      alert("Please enter a positive number for food item & servings.");
+      toast.error("Please enter a positive number for food item & servings.");
       return;
     }
     if (type === "add") {

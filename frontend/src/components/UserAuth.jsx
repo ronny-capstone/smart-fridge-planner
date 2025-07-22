@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { API_BASE_URL } from "../utils/api";
 import { AUTH_PATH, SIGNUP_PATH, LOGIN_PATH } from "../utils/paths";
+import { toast } from "react-toastify";
 
 export default function UserAuth({ onAuth }) {
   const [username, setUsername] = useState("");
@@ -40,11 +41,11 @@ export default function UserAuth({ onAuth }) {
     // Stops browser from refreshing
     e.preventDefault();
     if (username === "" || password === "") {
-      alert("Please fill out all fields: username and password");
+      toast.error("Please fill out all fields: username and password");
       return;
     }
     if (isSignUp && password.length < 8) {
-      alert("Password must be at least 8 characters long");
+      toast.error("Password must be at least 8 characters long");
       return;
     }
 
@@ -65,7 +66,7 @@ export default function UserAuth({ onAuth }) {
             // Signup successful, switch to login
             setIsSignUp(false);
             setPassword("");
-            alert("Signup successful");
+            toast.success("Signup successful");
           } else {
             // Login successful, need to create profile
             // Check if user has profile
@@ -97,15 +98,15 @@ export default function UserAuth({ onAuth }) {
         } else {
           if (response.status === 401) {
             if (isSignUp) {
-              alert("Error creating account. Please try again");
+              toast.error("Error creating account. Please try again");
             } else {
-              alert("Invalid username or password");
+              toast.error("Invalid username or password");
             }
           }
         }
       })
       .catch((err) => {
-        alert(`${isSignUp ? "Sign up" : "Login"} error`);
+        toast.error(`${isSignUp ? "Sign up" : "Login"} error`);
       });
   };
 

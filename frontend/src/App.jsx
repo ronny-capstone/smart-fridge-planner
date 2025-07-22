@@ -173,7 +173,7 @@ function App() {
                   }
                 }}
               >
-                🔔 Reset Dismissed Reminders
+                🔔 Reset Hidden Reminders
               </button>
               <button onClick={handleLogout}> Log out</button>
             </div>

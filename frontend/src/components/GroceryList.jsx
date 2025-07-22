@@ -3,7 +3,8 @@ import GroceryCard from "./GroceryCard";
 import LogModal from "./LogModal";
 import { useEffect, useState } from "react";
 import { API_BASE_URL } from "../utils/api";
-import { AUTH_PATH, GROCERY_PATH } from "../utils/paths";
+import { GROCERY_PATH } from "../utils/paths";
+import { toast } from "react-toastify";
 
 export default function GroceryList({ currentUser }) {
   const [groceries, setGroceries] = useState([]);
@@ -30,7 +31,7 @@ export default function GroceryList({ currentUser }) {
         }
       })
       .catch((err) => {
-        alert("Failed to fetch grocery items: ", err);
+        toast.error("Failed to fetch grocery items: ");
         setGroceries([]);
       });
   };
@@ -72,15 +73,14 @@ export default function GroceryList({ currentUser }) {
               groceries.filter((grocery) => grocery.id !== groceryToDelete.id)
             );
           } else {
-            alert(`Error deleting item: ${response.json().error}`);
+            toast.error(`Error deleting item. Please try again`);
           }
         })
         .catch((err) => {
-          console.log("Failed to delete grocery item:", err);
-          alert("Error deleting grocery item. Please try again");
+          toast.error("Error deleting grocery item. Please try again");
         });
     } catch (err) {
-      alert("Failed to delete grocery item:", err.message);
+      toast.error("Failed to delete grocery item:");
     }
   };
 

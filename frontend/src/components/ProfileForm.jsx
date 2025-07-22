@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { API_BASE_URL } from "../utils/api";
-import { PROFILE_PATH, AUTH_PATH } from "../utils/paths";
+import { PROFILE_PATH } from "../utils/paths";
 import { checkInvalidVariable } from "../utils/invalidVars";
+import { toast } from "react-toastify";
 
 export default function ProfileForm({ profileSubmit, currentUser }) {
   // Determines if user is updating an existing profile or creating new one
@@ -61,7 +62,7 @@ export default function ProfileForm({ profileSubmit, currentUser }) {
     // Stops page from refreshing
     e.preventDefault();
     if (!currentUser) {
-      alert("Please log in");
+      toast.error("Please log in");
       return;
     }
     if (
@@ -74,7 +75,7 @@ export default function ProfileForm({ profileSubmit, currentUser }) {
       checkInvalidVariable(healthGoal) ||
       checkInvalidVariable(dietaryPreferences)
     ) {
-      alert("Please fill out all fields");
+      toast.error("Please fill out all fields");
       return;
     }
 
@@ -111,17 +112,19 @@ export default function ProfileForm({ profileSubmit, currentUser }) {
           setActivityLevel("");
           setHealthGoal("");
           setDietaryPreferences("");
-          alert(`Profile ${isUpdating ? "updated" : "created"} successfully`);
+          toast.success(
+            `Profile ${isUpdating ? "updated" : "created"} successfully`
+          );
 
           if (profileSubmit) {
             profileSubmit();
           }
         })
         .catch((err) => {
-          alert(`Failed to ${isUpdating ? "update" : "create"} profile`);
+          toast.error(`Failed to ${isUpdating ? "update" : "create"} profile`);
         });
     } catch (err) {
-      alert(`Failed to ${isUpdating ? "update" : "create"} profile`);
+      toast.error(`Failed to ${isUpdating ? "update" : "create"} profile`);
     }
   };
 
@@ -131,7 +134,7 @@ export default function ProfileForm({ profileSubmit, currentUser }) {
         {isUpdating ? <h1> Update Profile</h1> : <h1> Create Profile</h1>}
 
         <div>
-          <p> Height</p>
+          <p className="text-lg pt-2">Height (feet, inches)</p>
           <input
             type="text"
             value={heightFeet}
@@ -147,7 +150,7 @@ export default function ProfileForm({ profileSubmit, currentUser }) {
         </div>
 
         <div>
-          <p>Weight</p>
+          <p className="text-lg pt-2"> Weight (kg)</p>
           <input
             type="text"
             value={weightKg}
@@ -157,7 +160,7 @@ export default function ProfileForm({ profileSubmit, currentUser }) {
         </div>
 
         <div>
-          <p>Age</p>
+          <p className="text-lg pt-2"> Age</p>
           <input
             type="text"
             value={age}
@@ -167,7 +170,7 @@ export default function ProfileForm({ profileSubmit, currentUser }) {
         </div>
 
         <div>
-          <p>Gender</p>
+          <p className="text-lg pt-2"> Gender</p>
           <select
             name="gender"
             value={gender}
@@ -181,7 +184,7 @@ export default function ProfileForm({ profileSubmit, currentUser }) {
         </div>
 
         <div>
-          <p>Activity Level</p>
+          <p className="text-lg pt-2"> Activity Level</p>
           <select
             name="activityLevel"
             value={activityLevel}
@@ -202,7 +205,7 @@ export default function ProfileForm({ profileSubmit, currentUser }) {
         </div>
 
         <div>
-          <p>Dietary Preferences</p>
+          <p className="text-lg pt-2">Dietary Preferences</p>
           <select
             name="dietaryPreference"
             value={dietaryPreferences}
@@ -218,7 +221,7 @@ export default function ProfileForm({ profileSubmit, currentUser }) {
         </div>
 
         <div>
-          <p>Health Goal</p>
+          <p className="text-lg pt-2"> Health Goal</p>
 
           <select
             name="healthGoal"
@@ -232,7 +235,7 @@ export default function ProfileForm({ profileSubmit, currentUser }) {
           </select>
         </div>
 
-        <div className="mb-1 w-full max-w-sm">
+        <div className="flex justify-center pt-2">
           <button type="submit" onClick={handleSubmit}>
             {isUpdating ? "Update Profile" : "Create Profile"}
           </button>

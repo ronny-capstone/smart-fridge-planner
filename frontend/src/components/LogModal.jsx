@@ -1,5 +1,6 @@
 import { createPortal } from "react-dom";
 import { API_BASE_URL } from "../utils/api";
+import { toast } from "react-toastify";
 
 export default function LogModal({
   children,
@@ -46,7 +47,7 @@ export default function LogModal({
             .then((res) => {
               if (res.status === 409) {
                 return res.json().then((err) => {
-                  alert("Duplicate food item: ", err.existingItem.name);
+                  toast.warning("Duplicate food item: ", err.existingItem.name);
                   throw new Error("Duplicate handled");
                 });
               }

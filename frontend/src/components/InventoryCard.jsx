@@ -2,6 +2,7 @@ import {
   formatDateString,
   getDaysUntilExpiration,
   getExpirationStatus,
+  formatDay,
 } from "../utils/dateUtils";
 
 export default function InventoryCard({ item, handleEdit, handleDelete }) {
@@ -22,13 +23,11 @@ export default function InventoryCard({ item, handleEdit, handleDelete }) {
 
   const getStatusMessage = () => {
     if (expirationStatus == "Expired") {
-      return `Expired ${Math.abs(daysUntil)} day${
-        Math.abs(daysUntil) !== 1 ? "s" : ""
-      } ago`;
+      return `Expired ${formatDay(daysUntil)} ago`;
     } else if (expirationStatus == "Expiring soon") {
-      return `Expires in ${daysUntil} day${daysUntil !== 1 ? "s" : ""}`;
+      return `Expires in ${formatDay(daysUntil)}`;
     } else if (expirationStatus == "Expiring this week") {
-      return `Expires in ${daysUntil} day${daysUntil !== 1 ? "s" : ""}`;
+      return `Expires in ${formatDay(daysUntil)}`;
     } else if (expirationStatus == "Fresh") {
       return `Fresh (${daysUntil} days left)`;
     }

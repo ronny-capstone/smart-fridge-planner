@@ -16,6 +16,20 @@ const DIETS = {
   NONE: "None",
 };
 
+const MEAL_TYPES = {
+  BREAKFAST: "breakfast",
+  LUNCH: "main course",
+  DINNER: "main course",
+};
+
+const MEAL_NAMES = {
+  BREAKFAST: "breakfast",
+  LUNCH: "lunch",
+  DINNER: "dinner",
+};
+
+const DAYS = 7;
+
 const PREP_CONSTANTS = {
   SUCCESS: 100,
   FAILURE: 10,
@@ -70,4 +84,7 @@ module.exports = {
   NUTRIENT_CONSTANTS,
   MACRO_CONSTANTS,
   PREP_BUCKETS,
+  MEAL_TYPES,
+  MEAL_NAMES,
+  DAYS,
 };

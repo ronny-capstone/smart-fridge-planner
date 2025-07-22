@@ -2,6 +2,7 @@ import { getDaysUntilExpiration } from "./dateUtils";
 import { toast } from "react-toastify";
 import { saveReminderDismissal, getDismissedReminders } from "./reminders";
 import { STOCK_CONSTANTS, EXPIRATION_CONSTANTS } from "./remindersConstants";
+import { capitalize } from "./stringUtils";
 
 const AUTOCLOSE = 3000;
 
@@ -27,6 +28,8 @@ const getIconAndColor = (type, days) => {
   }
 };
 
+
+
 const splitButtons = (closeToast, name, days, type, stock, itemId, userId) => {
   const handleDontShowAgain = async () => {
     await saveReminderDismissal(userId, itemId, type);
@@ -37,12 +40,12 @@ const splitButtons = (closeToast, name, days, type, stock, itemId, userId) => {
 
   // Styling from: https://fkhadra.github.io/react-toastify/how-to-style/
   return (
-    <div className={`${color} grid grid-cols-[1fr_1px_80px] w-full`}>
-      <div className="flex flex-col p-4">
+    <div className={`${color} grid grid-cols-[1fr_1px_100px] w-[500px]`}>
+      <div className="flex flex-col p-2">
         <span>{icon}</span>
         {type === "expiration" ? (
           <p className={`font-medium ${textColor}`}>
-            {name} expires{" "}
+            {capitalize(name)} expires{" "}
             {days === EXPIRATION_CONSTANTS.EXPIRES_TODAY
               ? "today"
               : days === EXPIRATION_CONSTANTS.EXPIRES_TOMORROW
@@ -50,7 +53,7 @@ const splitButtons = (closeToast, name, days, type, stock, itemId, userId) => {
               : `in ${days} days`}
           </p>
         ) : type === "expired" ? (
-          <p className={`font-medium ${textColor}`}>{name} has expired!</p>
+          <p className={`font-medium ${textColor}`}>{capitalize(name)} has expired!</p>
         ) : (
           <p className={`font-medium ${textColor}`}>
             Running low on {name} ({stock} left)
@@ -58,12 +61,12 @@ const splitButtons = (closeToast, name, days, type, stock, itemId, userId) => {
         )}
       </div>
       <div className="bg-zinc-900/20 h-full" />
-      <div className="grid grid-rows-[1fr_1px_1fr] h-full">
-        <button onClick={() => closeToast()} className="text-purple-500">
+      <div className="grid grid-rows-[1fr_1px_1fr] h-full text-sm">
+        <button onClick={() => closeToast()} className="text-blue-600">
           Dismiss
         </button>
         <div className="bg-zinc-900/20 w-full" />
-        <button onClick={handleDontShowAgain}>Don't show again</button>
+        <button onClick={handleDontShowAgain}>Hide Reminder</button>
       </div>
     </div>
   );

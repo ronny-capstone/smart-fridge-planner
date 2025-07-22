@@ -1,6 +1,6 @@
 const baseUrl = process.env.VITE_API_BASE_URL;
 const axios = require("axios");
-const { getDaysUntilExpiration } = require("../utils/dateUtils.js");
+const { getDaysUntilExpiration, formatDay } = require("../utils/dateUtils.js");
 const {
   RECIPES_PATH,
   REC_PATH,
@@ -300,7 +300,7 @@ const calculateShoppingAndExpiring = (mealPlan, inventoryAnalysis, userId) => {
     if (!usedInRecipe) {
       inventoryRecommendations.push({
         name: item.name,
-        reason: `Expires in ${daysLeft} day${daysLeft === 1 ? "" : "s"}`,
+        reason: `Expires in ${formatDay(daysLeft)}`,
         type: "expiring-replacement",
         item: item,
       });
@@ -315,9 +315,7 @@ const calculateShoppingAndExpiring = (mealPlan, inventoryAnalysis, userId) => {
     if (!recipeIngredientNames.includes(item.name.toLowerCase())) {
       inventoryRecommendations.push({
         name: item.name,
-        reason: `Expired ${Math.abs(daysLeft)} day${
-          daysLeft === 1 ? "s" : ""
-        } ago`,
+        reason: `Expired ${formatDay(daysLeft)} ago`,
         type: "expiring-replacement",
         item: item,
       });

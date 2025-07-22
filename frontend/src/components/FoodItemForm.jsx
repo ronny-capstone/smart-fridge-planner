@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { API_BASE_URL } from "../utils/api";
+import { toast } from "react-toastify";
 
 export default function FoodItemForm({ handleItemAdded }) {
   const [foodItem, setFoodItem] = useState("");
@@ -7,7 +8,7 @@ export default function FoodItemForm({ handleItemAdded }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (foodItem === "") {
-      alert("Please fill out all fields.");
+      toast.error("Please fill out all fields.");
       return;
     }
 
@@ -34,10 +35,10 @@ export default function FoodItemForm({ handleItemAdded }) {
           }
         })
         .catch((err) => {
-          alert("Error: ", err.message);
+          toast.error("Food search failed");
         });
     } catch (err) {
-      console.log("Failed to submit form:", err.message);
+      toast.error("Unable to search for food items. Please try again");
     }
   };
 

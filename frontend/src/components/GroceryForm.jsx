@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { API_BASE_URL } from "../utils/api";
 import { GROCERY_PATH, FOOD_PATH } from "../utils/paths";
+import { toast } from "react-toastify";
 
 export default function GroceryForm({
   handleGroceryAdded,
@@ -22,7 +23,7 @@ export default function GroceryForm({
         setFoodItems(data);
       })
       .catch((err) => {
-        console.log("Failed to fetch food items:", err);
+        toast.error("Unable to load food items˝");
         setFoodItems([]);
       });
   }, []);
@@ -41,7 +42,7 @@ export default function GroceryForm({
       (item) => item.id === parseInt(foodItem)
     );
     if (!selectedFood) {
-      alert("Please select a valid food item");
+      toast.error("Please select a valid food item");
       return;
     }
     try {
@@ -110,7 +111,7 @@ export default function GroceryForm({
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (foodItem === "" || quantity === "") {
-      alert("Please fill out all fields.");
+      toast.error("Please fill out all fields.");
       return;
     }
     if (
@@ -118,7 +119,7 @@ export default function GroceryForm({
       !Number.isInteger(parseInt(quantity)) ||
       parseInt(quantity) <= 0
     ) {
-      alert("Please select a food item and enter a positive quantity.");
+      toast.error("Please select a food item and enter a positive quantity.");
       return;
     }
     if (type === "add") {
